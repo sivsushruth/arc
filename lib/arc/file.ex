@@ -3,13 +3,13 @@ defmodule Arc.File do
 
   def generate_temporary_path(file \\ nil) do
     extension = Path.extname((file && file.path) || "")
-
+    tmp_dir = get_tmp_dir()
     file_name =
-      :crypto.rand_bytes(20)
+      :crypto.strong_rand_bytes(20)
       |> Base.encode32()
       |> Kernel.<>(extension)
 
-    Path.join(System.tmp_dir, file_name)
+    Path.join(tmp_dir, file_name)
   end
 
   # Given a remote file
@@ -117,5 +117,9 @@ end
 
       true -> {:error, :out_of_tries}
     end
+  end
+
+  defp get_tmp_dir() do
+    Application.get_env(:arc, :tmp_dir, System.tmp_dir())
   end
 end
